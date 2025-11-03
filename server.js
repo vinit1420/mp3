@@ -31,6 +31,10 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+  res.send('API is running ✅');
+});
+
 // Use routes as a module (see index.js)
 require('./routes')(app, router);
 
