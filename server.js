@@ -11,7 +11,7 @@ require('dotenv').config();
 var app = express();
 
 // Use environment defined port or 3000
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 4000;
 
 // Connect to a MongoDB --> Uncomment this once you have a connection string!!
 if (process.env.MONGODB_URI) {
