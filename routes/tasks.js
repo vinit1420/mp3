@@ -233,7 +233,15 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    return res.status(204).send();
+    // return 200 with a message
+    return res.status(200).json(
+      ok('Task deleted successfully.', {
+        _id: task._id,
+        name: task.name,
+        assignedUser: task.assignedUser,
+        assignedUserName: task.assignedUserName
+      })
+    );
   } catch (err) {
     console.error('DELETE /api/tasks/:id error:', err);
     return res
