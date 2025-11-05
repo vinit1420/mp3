@@ -1,11 +1,11 @@
-module.exports = function (router) {
+const express = require('express');
+const router = express.Router();
 
-    var homeRoute = router.route('/');
+router.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Llama.io API running',
+    data: null
+  });
+});
 
-    homeRoute.get(function (req, res) {
-        var connectionString = process.env.TOKEN;
-        res.json({ message: 'My connection string is ' + connectionString });
-    });
-
-    return router;
-}
+module.exports = router;

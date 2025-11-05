@@ -1,57 +1,37 @@
-// Get the packages we need
-var express = require('express'),
-    router = express.Router(),
-    mongoose = require('mongoose'),
-    bodyParser = require('body-parser');
-
-// Read .env file
+const express = require('express');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
-// Create our Express application
-var app = express();
+const app = express();
 
-// Use environment defined port or 3000
-var port = process.env.PORT || 4000;
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
 
-// Connect to a MongoDB --> Uncomment this once you have a connection string!!
-if (process.env.MONGODB_URI) {
-  mongoose
-    .connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((err) => {
-      console.error('MongoDB connection failed:', err.message);
-      startServer(); // still start app
-    });
-} else {
-  console.warn('MONGODB_URI not set — starting server without DB');
-  startServer();
-}
+// connect to Mongo
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mp3';
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('Mongo error:', err));
 
-// Allow CORS so that backend and frontend could be put on different servers
-var allowCrossDomain = function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept");
-    res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-    next();
-};
-app.use(allowCrossDomain);
+// import routes
+const homeRoute = require('./routes/home');
+const indexRoute = require('./routes/index');
+const usersRoute = require('./routes/users');
+const tasksRoute = require('./routes/tasks');
 
-// Use the body-parser package in our application
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-app.use(bodyParser.json());
+// mount routes
+app.use('/', homeRoute);
+app.use('/', indexRoute);
+app.use('/api/users', usersRoute);
+app.use('/api/tasks', tasksRoute);
 
-app.get('/', (req, res) => {
-  res.send('API is running ✅');
+// fallback 404 (JSON!)
+app.use((req, res) => {
+  res.status(404).json({
+    message: 'Endpoint not found',
+    data: null
+  });
 });
 
-// Use routes as a module (see index.js)
-require('./routes')(app, router);
-
-// Start the server
-app.listen(port);
-console.log('Server running on port ' + port);
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -20,28 +20,27 @@ def usage():
     print('dbClean.py -u <baseurl> -p <port>')
 
 def getUsers(conn):
-    # Retrieve the list of users
-    conn.request("GET","""/api/users?filter={"_id":1}""")
+    # build ?filter={"_id":1} but URL-encoded
+    params = urllib.parse.urlencode({
+        'filter': json.dumps({"_id": 1})
+    })
+    conn.request("GET", f"/api/users?{params}", headers={"Accept": "application/json"})
     response = conn.getresponse()
     data = response.read()
     d = json.loads(data)
 
-    # Array of user IDs
-    users = [str(d['data'][x]['_id']) for x in range(len(d['data']))]
-
-    return users
+    return [str(doc['_id']) for doc in d['data']]
 
 def getTasks(conn):
-    # Retrieve the list of tasks
-    conn.request("GET","""/api/tasks?filter={"_id":1}""")
+    params = urllib.parse.urlencode({
+        'filter': json.dumps({"_id": 1})
+    })
+    conn.request("GET", f"/api/tasks?{params}", headers={"Accept": "application/json"})
     response = conn.getresponse()
     data = response.read()
     d = json.loads(data)
 
-    # Array of user IDs
-    tasks = [str(d['data'][x]['_id']) for x in range(len(d['data']))]
-
-    return tasks
+    return [str(doc['_id']) for doc in d['data']]
 
 def main(argv):
 
